@@ -36,4 +36,5 @@ def load_model(filename, format ='matlab'):
             raise NotImplementedError("Format {} not implemented. Specify a correct format for the model".format(format))
     except:
         raise ImportError("The file has an incorrect format or does not match with implemented formats")
+    print('Model correctly loaded.')
     return model

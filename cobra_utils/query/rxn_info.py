@@ -36,6 +36,8 @@ def rxn_gene_associations_from_metabolites(model, metabolites, verbose=True):
 
     labels = ['MetName', 'MetID', 'RxnID', 'RxnName', 'GeneID', 'Subsystem', 'RxnFormula']
     rxn_gene_association = pd.DataFrame.from_records(rxn_gene_association, columns=labels)
+    if verbose:
+        print('Information correctly obtained.')
     return rxn_gene_association
 
 
@@ -70,6 +72,8 @@ def rxn_gene_associations_from_reactions(model, reactions, verbose=True):
             rxn_gene_association.append((str(gene.id), rxn.id, rxn.name, rxn.subsystem, rxn.reaction))
     labels = ['GeneID', 'RxnID', 'RxnName', 'SubSystem', 'RxnFormula']
     rxn_gene_association = pd.DataFrame.from_records(rxn_gene_association, columns=labels)
+    if verbose:
+        print('Information correctly obtained.')
     return rxn_gene_association
 
 
@@ -104,6 +108,8 @@ def rxn_gene_associations_from_genes(model, genes, verbose=True):
                 rxn_gene_association.append((str(g.id), rxn.id, rxn.name, rxn.subsystem, rxn.reaction))
     labels = ['GeneID', 'RxnID', 'RxnName', 'SubSystem', 'RxnFormula']
     rxn_gene_association = pd.DataFrame.from_records(rxn_gene_association, columns=labels)
+    if verbose:
+        print('Information correctly obtained.')
     return rxn_gene_association
 
 
@@ -134,4 +140,6 @@ def rxn_gene_associations_from_model(model, verbose=True):
             rxn_gene_association.append((str(gene.id), rxn.id, rxn.name, rxn.subsystem, rxn.reaction))
     labels = ['GeneID', 'RxnID', 'RxnName', 'SubSystem', 'RxnFormula']
     rxn_gene_association = pd.DataFrame.from_records(rxn_gene_association, columns=labels)
+    if verbose:
+        print('Information correctly obtained.')
     return rxn_gene_association
