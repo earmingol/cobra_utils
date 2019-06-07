@@ -1,7 +1,11 @@
+# -*- coding: utf-8 -*-
+
+from __future__ import absolute_import
+
 import pandas as pd
 
 
-def rxn_gene_associations_from_metabolites(model, metabolites, verbose=True):
+def rxn_info_from_metabolites(model, metabolites, verbose=True):
     '''
     This function looks for all the reactions where the metabolites in the list participate. Also, it retrieves the genes
     associated to those reactions.
@@ -32,16 +36,16 @@ def rxn_gene_associations_from_metabolites(model, metabolites, verbose=True):
         for rxn in met.reactions:
             for gene in rxn.genes:
                 rxn_gene_association.append(
-                    (met.name, met.id, rxn.id, rxn.name, gene.id, rxn.subsystem, rxn.reaction))
+                    (rxn.id, rxn.name, gene.id, rxn.subsystem, rxn.reaction, met.id, met.name))
 
-    labels = ['MetName', 'MetID', 'RxnID', 'RxnName', 'GeneID', 'Subsystem', 'RxnFormula']
+    labels = ['RxnID', 'RxnName', 'GeneID', 'Subsystem', 'RxnFormula', 'MetID', 'MetName']
     rxn_gene_association = pd.DataFrame.from_records(rxn_gene_association, columns=labels)
     if verbose:
         print('Information correctly obtained.')
     return rxn_gene_association
 
 
-def rxn_gene_associations_from_reactions(model, reactions, verbose=True):
+def rxn_info_from_reactions(model, reactions, verbose=True):
     '''
     This function looks for all the reactions and genes that are associated from a list of reactions ids.
 
@@ -77,7 +81,7 @@ def rxn_gene_associations_from_reactions(model, reactions, verbose=True):
     return rxn_gene_association
 
 
-def rxn_gene_associations_from_genes(model, genes, verbose=True):
+def rxn_info_from_genes(model, genes, verbose=True):
     '''
     This function looks for all the reactions and genes that are associated from a list of gene ids.
 
@@ -113,7 +117,7 @@ def rxn_gene_associations_from_genes(model, genes, verbose=True):
     return rxn_gene_association
 
 
-def rxn_gene_associations_from_model(model, verbose=True):
+def rxn_info_from_model(model, verbose=True):
     '''
     This function looks for all the reactions in the model and returns their respective information.
 

@@ -74,14 +74,14 @@ with open('cobra_utils/__init__.py', 'rb') as f:
     hit = _version_re.search(f.read().decode('utf-8')).group(1)
     version = str(ast.literal_eval(hit))
 
-setup(name='COBRA utils',
+setup(name='cobra_utils',
       version=version,
       license='BSD-3-Clause',
       description=description,
       long_description=long_description,
-      author="COBRA utils development team",
+      author="cobra_utils development team",
       author_email="earmingol@eng.ucsd.edu",
-      maintainer="COBRA utils development team",
+      maintainer="cobra_utils development team",
       maintainer_email="earmingol@eng.ucsd.edu",
       packages=find_packages(),
       ext_modules=extensions,
