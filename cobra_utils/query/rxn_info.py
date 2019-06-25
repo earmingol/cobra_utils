@@ -34,9 +34,13 @@ def rxn_info_from_metabolites(model, metabolites, verbose=True):
     for metabolite in metabolites:
         met = model.metabolites.get_by_id(metabolite)
         for rxn in met.reactions:
-            for gene in rxn.genes:
+            if len(rxn.genes) != 0:
+                for gene in rxn.genes:
+                    rxn_gene_association.append(
+                        (rxn.id, rxn.name, str(gene.id), rxn.subsystem, rxn.reaction, met.id, met.name))
+            else:
                 rxn_gene_association.append(
-                    (rxn.id, rxn.name, gene.id, rxn.subsystem, rxn.reaction, met.id, met.name))
+                    (rxn.id, rxn.name, '', rxn.subsystem, rxn.reaction, met.id, met.name))
 
     labels = ['RxnID', 'RxnName', 'GeneID', 'Subsystem', 'RxnFormula', 'MetID', 'MetName']
     rxn_gene_association = pd.DataFrame.from_records(rxn_gene_association, columns=labels)
@@ -72,8 +76,11 @@ def rxn_info_from_reactions(model, reactions, verbose=True):
     rxn_gene_association = []
     for reaction in reactions:
         rxn = model.reactions.get_by_id(reaction)
-        for gene in rxn.genes:
-            rxn_gene_association.append((str(gene.id), rxn.id, rxn.name, rxn.subsystem, rxn.reaction))
+        if len(rxn.genes) != 0:
+            for gene in rxn.genes:
+                rxn_gene_association.append((str(gene.id), rxn.id, rxn.name, rxn.subsystem, rxn.reaction))
+        else:
+            rxn_gene_association.append(('', rxn.id, rxn.name, rxn.subsystem, rxn.reaction))
     labels = ['GeneID', 'RxnID', 'RxnName', 'SubSystem', 'RxnFormula']
     rxn_gene_association = pd.DataFrame.from_records(rxn_gene_association, columns=labels)
     if verbose:
@@ -140,8 +147,11 @@ def rxn_info_from_model(model, verbose=True):
 
     rxn_gene_association = []
     for rxn in model.reactions:
-        for gene in rxn.genes:
-            rxn_gene_association.append((str(gene.id), rxn.id, rxn.name, rxn.subsystem, rxn.reaction))
+        if len(rxn.genes) != 0:
+            for gene in rxn.genes:
+                rxn_gene_association.append((str(gene.id), rxn.id, rxn.name, rxn.subsystem, rxn.reaction))
+        else:
+            rxn_gene_association.append(('', rxn.id, rxn.name, rxn.subsystem, rxn.reaction))
     labels = ['GeneID', 'RxnID', 'RxnName', 'SubSystem', 'RxnFormula']
     rxn_gene_association = pd.DataFrame.from_records(rxn_gene_association, columns=labels)
     if verbose:
