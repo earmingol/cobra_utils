@@ -5,7 +5,7 @@ from __future__ import absolute_import
 import cobra
 
 
-def load_model(filename, format ='matlab'):
+def load_model(filename, format='matlab', verbose=True):
     '''
     This function opens a metabolic reconstruction from a given format.
 
@@ -21,12 +21,16 @@ def load_model(filename, format ='matlab'):
         'sbml' for .xml file
         'yaml' for  .yaml or .yml file
 
+    verbose : boolean, True by default
+        A variable to enable or disable the printings of this function.
+
     Returns
     -------
     model : cobra.core.Model.Model
         The resulting cobra model.
     '''
-    print('Loading genome-scale model')
+    if verbose:
+        print('Loading genome-scale model')
     try:
         if format == 'json':
             model = cobra.io.load_json_model(filename)
@@ -40,5 +44,6 @@ def load_model(filename, format ='matlab'):
             raise NotImplementedError("Format {} not implemented. Specify a correct format for the model".format(format))
     except:
         raise ImportError("The file has an incorrect format or does not match with implemented formats")
-    print('Model correctly loaded.')
+    if verbose:
+        print('Model correctly loaded.')
     return model
