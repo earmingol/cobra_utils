@@ -1,5 +1,7 @@
 # COBRA utils
 
+[![PyPI version](https://badge.fury.io/py/cobra-utils.svg)](https://pypi.org/project/cobra-utils/)
+
 This is a series of utilities to use together with [COBRApy](https://github.com/opencobra/cobrapy).
 The goal of this tool is to make easier the usage of COBRApy.
 
@@ -16,10 +18,15 @@ To install this package from Windows, run:
 python -m pip install cobra-utils
 ```
 
-In case you downloaded the source code, run:
+In case you downloaded the source code, in a Unix OS run:
 
 ```
 pip install -e .
+```
+
+or in Windows:
+```
+python -m pip install -e .
 ```
 
 ## Examples

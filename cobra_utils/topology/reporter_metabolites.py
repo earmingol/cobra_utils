@@ -89,12 +89,11 @@ def reporter_metabolites(model, p_val_df, genes=None, verbose=True):
     mean_Z = met_Z_scores.copy()
     std_Z  = met_Z_scores.copy()
 
-    for i, met in enumerate(unique_mets):
-        met_genes = met_info.loc[met_info.MetID == met]['GeneID'].values
-        met_genes = np.unique(met_genes)
+    for  met in unique_mets:
+        met_genes = met_info.loc[met_info.MetID == met]['GeneID'].unique()
 
         if len(met_genes) > 0:
-            met_Z_scores.loc[met, 'value'] = np.nansum(gene_Z_scores.loc[met_genes]['value'].values)/np.sqrt(len(met_genes))
+            met_Z_scores.loc[met, 'value'] = np.nansum(gene_Z_scores.loc[met_genes]['value'].values) / np.sqrt(len(met_genes))
             mean_Z.loc[met, 'value'] = np.nanmean(gene_Z_scores.loc[met_genes]['value'].values)
             std_Z.loc[met, 'value'] = np.nanstd(gene_Z_scores.loc[met_genes]['value'].values)
             met_N_genes.loc[met, 'value'] = len(met_genes)
@@ -123,7 +122,7 @@ def reporter_metabolites(model, p_val_df, genes=None, verbose=True):
         mean_bg_Z = np.nanmean(bg_Z)
         std_bg_Z = np.nanstd(bg_Z)
 
-        met_Z_scores.loc[met_N_genes.value == size] = (met_Z_scores.loc[met_N_genes.value == size].values - mean_bg_Z)/std_bg_Z
+        met_Z_scores.loc[met_N_genes.value == size] = (met_Z_scores.loc[met_N_genes.value == size].values - mean_bg_Z) / std_bg_Z
 
     # Calculate p-values
     met_p_values = met_Z_scores['value'].apply(lambda x: 1.0 - stats.norm.cdf(x)).to_frame()
