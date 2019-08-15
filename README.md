@@ -30,4 +30,5 @@ python -m pip install -e .
 ```
 
 ## Examples
-* [Loading a model and retrieving reactions information](./Example_Rxn_Information.ipynb)
+* [Loading a model and retrieving reactions information](./notebooks/Ecoli_Rxn_Information.ipynb)
+* [Reporter metabolites from differential expression in two strains of *E. coli*](./notebooks/Ecoli_Reporter_Metabolites.ipynb)
