@@ -79,9 +79,6 @@ def reporter_metabolites(model, p_val_df, genes=None, verbose=True):
     met_info = met_info[['MetID', 'GeneID']]
     met_info = met_info.loc[met_info.GeneID != '']
     met_info.drop_duplicates(inplace=True)
-    #met_info.set_index('MetID', inplace=True)
-
-
 
     # For each metabolite calculate the aggregate Z-score and keep track of the number of neighbouring genes
     met_Z_scores = np.empty((len(unique_mets), 1))
@@ -94,6 +91,7 @@ def reporter_metabolites(model, p_val_df, genes=None, verbose=True):
 
     for i, met in enumerate(unique_mets):
         met_genes = met_info.loc[met_info.MetID == met]['GeneID'].values
+        met_genes = np.unique(met_genes)
 
         if len(met_genes) > 0:
             met_Z_scores.loc[met, 'value'] = np.nansum(gene_Z_scores.loc[met_genes]['value'].values)/np.sqrt(len(met_genes))
@@ -108,7 +106,6 @@ def reporter_metabolites(model, p_val_df, genes=None, verbose=True):
     met_N_genes = met_N_genes.loc[met_with_Z]
     mean_Z = mean_Z.loc[met_with_Z]
     std_Z = std_Z.loc[met_with_Z]
-
 
     # Correct for background by calculating the mean Z-score for random sets of the same size as the ones that
     # were found for the metabolites
@@ -130,12 +127,15 @@ def reporter_metabolites(model, p_val_df, genes=None, verbose=True):
 
     # Calculate p-values
     met_p_values = met_Z_scores['value'].apply(lambda x: 1.0 - stats.norm.cdf(x)).to_frame()
+    met_p_values.rename(columns={'value': 'p-value'}, inplace=True)
+
+    # Report results
     met_p_values['corrected Z'] = met_Z_scores['value'].values
     met_p_values['mean Z'] = mean_Z['value'].values
     met_p_values['std Z'] = std_Z['value'].values
     met_p_values['gene number'] = met_N_genes['value'].values
 
-    met_p_values.rename(columns={'value': 'p-value'}, inplace=True)
+    #Sort p-values from smallest value.
     met_p_values.sort_values(by='p-value', ascending=True, inplace=True)
     return met_p_values
 
