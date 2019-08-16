@@ -2,4 +2,4 @@
 
 from __future__ import absolute_import
 
-from cobra_utils.io.load_data import *
+from cobra_utils.io.load_data import load_model
