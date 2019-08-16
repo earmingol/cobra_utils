@@ -6,4 +6,4 @@ from cobra_utils import io
 from cobra_utils import query
 from cobra_utils import topology
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
