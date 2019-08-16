@@ -25,7 +25,7 @@ def rxn_info_from_metabolites(model, metabolites, verbose=True):
     -------
     rxn_gene_association : pandas.DataFrame
         A pandas dataframe containing the information retrieved. The columns are :
-        'MetName', 'MetID', 'RxnID', 'RxnName', 'GeneID', 'Subsystem', 'RxnFormula'
+        'MetID', 'MetName', 'RxnID', 'RxnName', 'GeneID', 'Subsystem', 'RxnFormula'
     '''
     if verbose:
         print('Using list of metabolites to get reactions where they participate. Also, getting genes of those reactions.')
@@ -37,12 +37,12 @@ def rxn_info_from_metabolites(model, metabolites, verbose=True):
             if len(rxn.genes) != 0:
                 for gene in rxn.genes:
                     rxn_gene_association.append(
-                        (rxn.id, rxn.name, str(gene.id), rxn.subsystem, rxn.reaction, met.id, met.name))
+                        (met.id, met.name, rxn.id, rxn.name, str(gene.id), rxn.subsystem, rxn.reaction))
             else:
                 rxn_gene_association.append(
-                    (rxn.id, rxn.name, '', rxn.subsystem, rxn.reaction, met.id, met.name))
+                    (met.id, met.name, rxn.id, rxn.name, '', rxn.subsystem, rxn.reaction))
 
-    labels = ['RxnID', 'RxnName', 'GeneID', 'Subsystem', 'RxnFormula', 'MetID', 'MetName']
+    labels = ['MetID', 'MetName', 'RxnID', 'RxnName', 'GeneID', 'Subsystem', 'RxnFormula']
     rxn_gene_association = pd.DataFrame.from_records(rxn_gene_association, columns=labels)
     if verbose:
         print('Information correctly obtained.')
@@ -68,7 +68,7 @@ def rxn_info_from_reactions(model, reactions, verbose=True):
     -------
     rxn_gene_association : pandas.DataFrame
         A pandas dataframe containing the information retrieved. The columns are :
-        'GeneID', 'RxnID', 'RxnName', 'SubSystem', 'RxnFormula'
+        'RxnID', 'RxnName', 'GeneID', 'SubSystem', 'RxnFormula'
     '''
     if verbose:
         print('Using list of reactions to get their information and genes associated.')
@@ -78,10 +78,10 @@ def rxn_info_from_reactions(model, reactions, verbose=True):
         rxn = model.reactions.get_by_id(reaction)
         if len(rxn.genes) != 0:
             for gene in rxn.genes:
-                rxn_gene_association.append((str(gene.id), rxn.id, rxn.name, rxn.subsystem, rxn.reaction))
+                rxn_gene_association.append((rxn.id, rxn.name, str(gene.id), rxn.subsystem, rxn.reaction))
         else:
-            rxn_gene_association.append(('', rxn.id, rxn.name, rxn.subsystem, rxn.reaction))
-    labels = ['GeneID', 'RxnID', 'RxnName', 'SubSystem', 'RxnFormula']
+            rxn_gene_association.append((rxn.id, rxn.name, '', rxn.subsystem, rxn.reaction))
+    labels = ['RxnID', 'RxnName', 'GeneID', 'SubSystem', 'RxnFormula']
     rxn_gene_association = pd.DataFrame.from_records(rxn_gene_association, columns=labels)
     if verbose:
         print('Information correctly obtained.')
@@ -140,7 +140,7 @@ def rxn_info_from_model(model, verbose=True):
     -------
     rxn_gene_association : pandas.DataFrame
         A pandas dataframe containing the information retrieved. The columns are :
-        'GeneID', 'RxnID', 'RxnName', 'SubSystem', 'RxnFormula'
+        'RxnID', 'RxnName', 'GeneID', 'SubSystem', 'RxnFormula'
     '''
     if verbose:
         print('Getting information for all reactions in the model.')
@@ -149,10 +149,10 @@ def rxn_info_from_model(model, verbose=True):
     for rxn in model.reactions:
         if len(rxn.genes) != 0:
             for gene in rxn.genes:
-                rxn_gene_association.append((str(gene.id), rxn.id, rxn.name, rxn.subsystem, rxn.reaction))
+                rxn_gene_association.append((rxn.id, rxn.name, str(gene.id), rxn.subsystem, rxn.reaction))
         else:
-            rxn_gene_association.append(('', rxn.id, rxn.name, rxn.subsystem, rxn.reaction))
-    labels = ['GeneID', 'RxnID', 'RxnName', 'SubSystem', 'RxnFormula']
+            rxn_gene_association.append((rxn.id, rxn.name, '', rxn.subsystem, rxn.reaction))
+    labels = ['RxnID', 'RxnName', 'GeneID', 'SubSystem', 'RxnFormula']
     rxn_gene_association = pd.DataFrame.from_records(rxn_gene_association, columns=labels)
     if verbose:
         print('Information correctly obtained.')
