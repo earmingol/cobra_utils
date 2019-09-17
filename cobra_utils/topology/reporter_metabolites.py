@@ -48,7 +48,7 @@ def reporter_metabolites(model, p_val_df, genes=None, verbose=True):
     if verbose:
         print('Running reporter metabolites analysis')
     # Drop nan genes
-    df = p_val_df.dropna()
+    df = p_val_df.dropna(how='all', axis=0)
 
     # Evaluate information of dataframe
     if 'value' not in list(df.columns):
