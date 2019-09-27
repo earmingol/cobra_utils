@@ -27,7 +27,6 @@ def reporter_metabolites(model, p_val_df, genes=None, verbose=True):
     model : cobra.core.Model.Model
         A cobra model.
 
-
     p_val_df : pandas.DataFrame
         A dataframe with gene names as index. It have to contains the p-values for the differential expression
         of the respective indexing genes.
@@ -42,7 +41,7 @@ def reporter_metabolites(model, p_val_df, genes=None, verbose=True):
     -------
     met_p_values : pandas.DataFrame
         A dataframe reporting the respective p-values for the metabolites that had associated genes containing a p-value
-        in p_val_matrix. Additionally, the corected, mean and std Z values as well as gene number for the given metabolite
+        in p_val_matrix. Additionally, the corrected, mean and std Z values as well as gene number for the given metabolite
         are reported in each case.
     '''
     if verbose:
@@ -81,34 +80,25 @@ def reporter_metabolites(model, p_val_df, genes=None, verbose=True):
     met_info.drop_duplicates(inplace=True)
 
     # For each metabolite calculate the aggregate Z-score and keep track of the number of neighbouring genes
-    met_Z_scores = np.empty((len(unique_mets), 1))
-    met_Z_scores[:] = np.nan
-    met_Z_scores = pd.DataFrame(met_Z_scores, index=unique_mets, columns=['value'])
+    Z_scores = np.empty((len(unique_mets), 4))
+    Z_scores[:] = np.nan
+    Z_scores = pd.DataFrame(Z_scores, index=unique_mets, columns=['Z-score', 'Mean-Z', 'Std-Z', 'Genes-Number'])
 
-    met_N_genes = met_Z_scores.copy()
-    mean_Z = met_Z_scores.copy()
-    std_Z  = met_Z_scores.copy()
-
-    for  met in unique_mets:
+    for met in unique_mets:
         met_genes = met_info.loc[met_info.MetID == met]['GeneID'].unique()
 
         if len(met_genes) > 0:
-            met_Z_scores.loc[met, 'value'] = np.nansum(gene_Z_scores.loc[met_genes]['value'].values) / np.sqrt(len(met_genes))
-            mean_Z.loc[met, 'value'] = np.nanmean(gene_Z_scores.loc[met_genes]['value'].values)
-            std_Z.loc[met, 'value'] = np.nanstd(gene_Z_scores.loc[met_genes]['value'].values)
-            met_N_genes.loc[met, 'value'] = len(met_genes)
+            Z_scores.loc[met, 'Z-score'] = np.nansum(gene_Z_scores.loc[met_genes]['value'].values) / np.sqrt(len(met_genes))
+            Z_scores.loc[met, 'Mean-Z'] = np.nanmean(gene_Z_scores.loc[met_genes]['value'].values)
+            Z_scores.loc[met, 'Std-Z'] = np.nanstd(gene_Z_scores.loc[met_genes]['value'].values)
+            Z_scores.loc[met, 'Genes-Number'] = len(met_genes)
 
     # Remove the metabolites which have no Z-scores
-    met_Z_scores = met_Z_scores.dropna()
-    met_with_Z = list(met_Z_scores.index)
-
-    met_N_genes = met_N_genes.loc[met_with_Z]
-    mean_Z = mean_Z.loc[met_with_Z]
-    std_Z = std_Z.loc[met_with_Z]
+    Z_scores = Z_scores.loc[~Z_scores['Z-score'].isna()]
 
     # Correct for background by calculating the mean Z-score for random sets of the same size as the ones that
     # were found for the metabolites
-    for i, size in enumerate(met_N_genes.value.unique()):
+    for i, size in enumerate(Z_scores['Genes-Number'].unique()):
         size = int(size)
         # Sample 100000 sets for each size. Sample with replacement
         n_samples = 100000
@@ -122,17 +112,17 @@ def reporter_metabolites(model, p_val_df, genes=None, verbose=True):
         mean_bg_Z = np.nanmean(bg_Z)
         std_bg_Z = np.nanstd(bg_Z)
 
-        met_Z_scores.loc[met_N_genes.value == size] = (met_Z_scores.loc[met_N_genes.value == size].values - mean_bg_Z) / std_bg_Z
+        Z_scores.loc[Z_scores['Genes-Number'] == size, 'Z-score'] = (Z_scores.loc[Z_scores['Genes-Number'] == size, 'Z-score'].values - mean_bg_Z) / std_bg_Z
 
     # Calculate p-values
-    met_p_values = met_Z_scores['value'].apply(lambda x: 1.0 - stats.norm.cdf(x)).to_frame()
-    met_p_values.rename(columns={'value': 'p-value'}, inplace=True)
+    met_p_values = Z_scores['Z-score'].apply(lambda x: 1.0 - stats.norm.cdf(x)).to_frame()
+    met_p_values.rename(columns={'Z-score': 'p-value'}, inplace=True)
 
     # Report results
-    met_p_values['corrected Z'] = met_Z_scores['value'].values
-    met_p_values['mean Z'] = mean_Z['value'].values
-    met_p_values['std Z'] = std_Z['value'].values
-    met_p_values['gene number'] = met_N_genes['value'].values
+    met_p_values['corrected Z'] = Z_scores['Z-score'].values
+    met_p_values['mean Z'] = Z_scores['Mean-Z'].values
+    met_p_values['std Z'] = Z_scores['Std-Z'].values
+    met_p_values['gene number'] = Z_scores['Genes-Number'].values
 
     #Sort p-values from smallest value.
     met_p_values.sort_values(by='p-value', ascending=True, inplace=True)
