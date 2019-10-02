@@ -1,6 +1,7 @@
 # COBRA utils
 
 [![PyPI version](https://badge.fury.io/py/cobra-utils.svg)](https://pypi.org/project/cobra-utils/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3470217.svg)](https://doi.org/10.5281/zenodo.3470217)
 
 This is a series of utilities to use together with [COBRApy](https://github.com/opencobra/cobrapy).
 The goal of this tool is to make easier the usage of COBRApy.
