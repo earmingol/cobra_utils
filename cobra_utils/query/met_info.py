@@ -3,6 +3,9 @@
 from __future__ import absolute_import
 
 import pandas as pd
+from cobra_utils.query import get_ids
+
+import warnings
 
 
 def met_info_from_metabolites(model, metabolites, verbose=True):
@@ -31,7 +34,12 @@ def met_info_from_metabolites(model, metabolites, verbose=True):
         print('Using list of metabolites to get information where they participate. Also, getting associated reactions and genes.')
 
     met_rxn_gene_association = []
-    for metabolite in metabolites:
+    mets_ = set(metabolites).intersection(set(get_ids.get_met_ids(model)))
+    if verbose:
+        excluded = set(metabolites) - mets_
+        warnings.warn('{} are not in the model'.format(excluded))
+
+    for metabolite in mets_:
         met = model.metabolites.get_by_id(metabolite)
         for rxn in met.reactions:
             if len(rxn.genes) != 0:
@@ -72,7 +80,12 @@ def met_info_from_reactions(model, reactions, verbose=True):
         print('Using list of reactions to get information about metabolites and genes associated.')
 
     met_rxn_gene_association = []
-    for reaction in reactions:
+    rxns_ = set(reactions).intersection(set(get_ids.get_rxn_ids(model)))
+    if verbose:
+        excluded = set(reactions) - rxns_
+        warnings.warn('{} are not in the model'.format(excluded))
+
+    for reaction in rxns_:
         rxn = model.reactions.get_by_id(reaction)
         for met in rxn.metabolites:
             if len(rxn.genes) != 0:
@@ -112,7 +125,12 @@ def met_info_from_genes(model, genes, verbose=True):
         print('Using list of genes to get the metabolites associated and their information.')
 
     met_rxn_gene_association = []
-    for gene in genes:
+    genes_ = set(genes).intersection(set(get_ids.get_gene_ids(model)))
+    if verbose:
+        excluded = set(genes) - genes_
+        warnings.warn('{} are not in the model'.format(excluded))
+
+    for gene in genes_:
         g = model.genes.get_by_id(gene)
         for rxn in g.reactions:
             for met in rxn.metabolites:
