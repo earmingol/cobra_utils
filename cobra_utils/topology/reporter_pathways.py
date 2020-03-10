@@ -8,9 +8,10 @@ import scipy.stats as stats
 
 from sklearn.utils import resample
 from cobra_utils import query
+from _collections import defaultdict
 
 
-def reporter_pathways(model, p_val_df, pathways=None, verbose=True):
+def reporter_pathways(model, p_val_df, pathways=None, rxn_pathways_association=None, verbose=True):
     '''
     This function computes an aggregate p-value for each pathway (SubSystem in the metabolic reconstruction) based on the
     network topology of the metabolic reconstruction. It takes the p-value for differential expression of each gene and
@@ -27,6 +28,10 @@ def reporter_pathways(model, p_val_df, pathways=None, verbose=True):
 
     pathways : array-like
         An array or list containing pathway names (str) to be considered.
+
+    rxn_pathways_association : dict
+        A dictionary where the keys are the pathways and the values a list of reactions (RxnIDs) that belong to those
+        pathways.
 
     verbose : boolean, True by default.
         A variable to enable or disable the printings of this function.
@@ -60,9 +65,19 @@ def reporter_pathways(model, p_val_df, pathways=None, verbose=True):
     gene_Z_scores = gene_Z_scores.dropna()
 
     # Genes - Rxn - SubSystems info
-    rxn_info = query.rxn_info_from_genes(model=model,
-                                         genes=list(df.index),
-                                         verbose=verbose)
+    if rxn_pathways_association is None:
+        rxn_info = query.rxn_info_from_genes(model=model,
+                                             genes=list(df.index),
+                                             verbose=verbose)
+    else:
+        records = []
+        for key, val in rxn_pathways_association.items():
+            for reaction in val:
+                rxn = model.reactions.get_by_id(reaction)
+                if len(rxn.genes) != 0:
+                    for gene in rxn.genes:
+                        records.append((rxn.id, str(gene.id), key))
+        rxn_info = pd.DataFrame.from_records(records, columns=['RxnID', 'GeneID', 'SubSystem'])
 
     if pathways is not None:
         rxn_info = rxn_info.loc[rxn_info.SubSystem.isin(pathways)]
@@ -80,7 +95,8 @@ def reporter_pathways(model, p_val_df, pathways=None, verbose=True):
     Z_scores = pd.DataFrame(Z_scores, index=unique_pathways, columns=['Z-score', 'Mean-Z', 'Std-Z', 'Genes-Number'])
 
     for path in unique_pathways:
-        path_genes = rxn_info.loc[rxn_info.SubSystem == path]['GeneID'].unique()
+        path_genes = rxn_info.loc[rxn_info.SubSystem == path]['GeneID'].unique().tolist()
+        path_genes = list(set(path_genes).intersection(set(gene_Z_scores.index)))
 
         if len(path_genes) > 0:
             Z_scores.loc[path, 'Z-score'] = np.nansum(gene_Z_scores.loc[path_genes]['value'].values) / np.sqrt(len(path_genes))
