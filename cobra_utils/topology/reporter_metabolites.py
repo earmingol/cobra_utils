@@ -86,6 +86,7 @@ def reporter_metabolites(model, p_val_df, genes=None, verbose=True):
 
     for met in unique_mets:
         met_genes = met_info.loc[met_info.MetID == met]['GeneID'].unique()
+        met_genes = list(set(met_genes).intersection(set(gene_Z_scores.index)))
 
         if len(met_genes) > 0:
             Z_scores.loc[met, 'Z-score'] = np.nansum(gene_Z_scores.loc[met_genes]['value'].values) / np.sqrt(len(met_genes))
