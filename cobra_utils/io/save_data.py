@@ -41,4 +41,3 @@ def save_model(filename, format='matlab', verbose=True, **kwargs):
         raise ImportError("The file has an incorrect format or does not match with implemented formats")
     if verbose:
         print('Model correctly saved.')
-    return model
